@@ -1,0 +1,72 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+Компонент
+export default class Hello extends React.Component {
+  render() {
+    return <div>Hello</div>;
+  }
+}
+
+Очевидные тезисы
+Компонент React – это класс, который наследуется от класса React.Component (как мы увидим позже, это не единственный способ создать компонент).
+Функция render возвращает нечто (рассмотрим позже), что будет отрисовано в браузере. Класс-компонент без функции render существовать не может, это его интерфейс.
+
+JSX – это похожее на XML-разметку расширение для JavaScript, созданное специально для задач React. React из коробки поставляется с набором компонентов, которые полностью повторяют HTML. По большей части синтаксис и структура JSX и HTML совпадают, но есть некоторые важные различия:
+
+Так как это похожий на XML синтаксис, одиночные теги в JSX должны быть закрыты: <hr />.
+Вместо атрибута class в JSX используется имя свойства в DOM: className.
+
+Так же как и в HTML, из компонентов можно строить композиции, например такую:
+const vdom = (
+  <div className="card">
+    <div className="card-body">
+      <h4 className="card-title">Card title</h4>
+      <p className="card-text">my text</p>
+      <a href="#" className="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
+);
+
+
+
+Любой текст, записанный внутри тегов (будем называть их так для простоты), остаётся просто статическим текстом на выводе. А что делать, если нужно вставить значение переменной? Ответ ниже:
+
+const name = 'Eva';
+const cname = 'container';
+
+const vdom1 = <div>Hello, {name}</div>;
+const vdom2 = <div>Hello, {name.repeat(3)}</div>;
+const vdom3 = <div className={cname}>Hello!</div>;
+
+
+
+Для решения этой задачи, в React ввели специальный компонент <React.Fragment>, которым можно оборачивать любую коллекцию элементов. Его особенность в том, что этот элемент никак не отражается в реальном DOM, а существует только на уровне JSX.
+
+class Section extends React.Component {
+  render() {
+    const { header, body } = this.props;
+
+    return (
+      <React.Fragment>
+        <h2>{header}</h2>
+        <div>{body}</div>
+      </React.Fragment>
+    );
+  }
+}
+
+У этого элемента есть короткая версия <> записи:
+
+class Section extends React.Component {
+  render() {
+    const { header, body } = this.props;
+
+    return (
+      <>
+        <h2>{header}</h2>
+        <div>{body}</div>
+      </>
+    );
+  }
+}
