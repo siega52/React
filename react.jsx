@@ -34,6 +34,7 @@ const Card = ({title, text}) => {
 export default Card;
 
 
+
 // Реализуйте и экспортируйте по умолчанию компонент Definitions, который принимает свойство data следующей структуры:
 // const definitions = [
 //   { dt: 'one', dd: 'two' },
@@ -61,6 +62,7 @@ const Definitions = ({data}) => {
 export default Definitions;
 
 
+
 // Реализуйте компонент Progress, который принимает свойство percentage и рисует статический прогресс бар.
 // Использование:
 // <Progress percentage={40} />;
@@ -74,3 +76,50 @@ const Progress = ({percentage}) => {
 };
 
 export default Progress;
+
+
+
+// Реализуйте компонент Alert, который отрисовывает алерт бутстрапа. Компонент принимает на вход два свойства:
+
+// text - отображаемый текст
+// type - тип алерта, может принимать одно из следующих значений: primary, secondary, success, danger, warning, info, light, dark;
+// Пример использования:
+// <Alert type="warning" text="what is love?" />;
+// Вывод:
+// <div class="alert alert-warning" role="alert">what is love?</div>
+
+const Alert = ({type, text}) => {
+  return (
+    <div className={`alert alert-${type}`} role="alert">{text}</div>;
+  );
+};
+
+export default Alert;
+
+
+
+// Реализуйте компонент ListGroup, который отрисовывает переданных детей, оборачивая их в список.
+// Пример использования:
+// <ListGroup>
+//   <p>one</p>
+//   <p>two</p>
+// </ListGroup>;
+// Результат:
+// <ul class="list-group">
+//   <li class="list-group-item"><p>one</p></li>
+//   <li class="list-group-item"><p>two</p></li>
+// </ul>
+
+const ListGroup = ({children}) => {
+  return (
+    <ul className="list-group">
+      {React.Children.map(children, (child, index) => (
+        <li key={index} className="list-group-item">
+          {child}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default ListGroup;
