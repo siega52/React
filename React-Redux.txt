@@ -71,3 +71,20 @@ class Section extends React.Component {
   }
 }
 
+
+Для решения этой задачи создатели React рекомендуют использовать пакет classnames. Принцип его работы прост: вместо манипулирования строчкой напрямую, нужно сформировать правильный объект, который уже будет преобразован в строку.
+
+import cn from 'classnames';
+
+class Button extends React.Component {
+  render () {
+    const { isPressed, isHovered, label } = this.props;
+    // значение это true или false. Если значение true, то класс будет включен, если false – то нет
+    // 'btn' это класс который будет подставлен в любом случае
+    const btnClass = cn('btn', {
+      'btn-pressed': isPressed,
+      'btn-over': !isPressed && isHovered,
+    });
+    return <button className={btnClass}>{label}</button>;
+  }
+};
