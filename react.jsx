@@ -254,3 +254,282 @@ const Carousel = ({ images, autoPlayInterval = 3000 }) => {
 };
 
 export default Carousel;
+
+
+
+// Реализуйте компонент <Collapse>, который по клику на ссылке отображает свое содержимое и при повторном - прячет. Содержимое передается в компонент через свойство text. За начальное состояние открытости, отвечает свойство opened, которое по умолчанию равно true.
+
+// const text = 'collapse me';
+// <Collapse text={text} opened={false} />;
+// <div>
+//   <p>
+//     <a class="btn btn-primary" href="#">Link with href</a>
+//   </p>
+//   <div class="collapse">
+//     <div class="card card-body">
+//       collapse me
+//     </div>
+//   </div>
+// </div>
+
+const Collapse = ({text, opened = true}) => {
+  const [isOpen, setIsOpen] = useState(opened);
+
+  const toggleCollapse = () => {
+    setIsOpen(!isOpen);
+  }
+
+  return (
+    <div>
+      <p>
+        <a href="#" className="btn btn-primary" onClick={(e) => {e.preventDefault(); toggleCollapse();}}>Link with href</a>
+      </p>
+      <div className={`collapse ${isOpen ? 'show' : ''}`}>
+        <div className="card card-body">{text}</div>
+      </div>
+    </div>
+  );
+};
+
+export default Collapse;
+
+
+
+// Реализуйте компонент <MyForm> отображающий форму из шести элементов:
+// email - инпут типа email
+// password - инпут типа password
+// address - textarea
+// city - текстовый инпут
+// country - select со следующими значениями: argentina, russia, china.
+// Accept Rules - checkbox
+// После сабмита формы, появляется таблица в которой показываются значения всех полей. Из этой формы можно вернуться в редактирование по кнопке Back. При этом все данные должны оказаться на своих местах.
+
+// Форма
+// <form name="myForm">
+//   <div class="form-row">
+//     <div class="form-group col-md-6">
+//       <label for="email" class="col-form-label">Email</label>
+//       <input type="email" name="email" class="form-control" id="email" placeholder="Email">
+//     </div>
+//     <div class="form-group col-md-6">
+//       <label for="password" class="col-form-label">Password</label>
+//       <input type="password" name="password" class="form-control" id="password" placeholder="Password">
+//     </div>
+//   </div>
+//   <div class="form-group">
+//     <label for="address" class="col-form-label">Address</label>
+//     <textarea type="text" class="form-control" name="address" id="address" placeholder="1234 Main St"></textarea>
+//   </div>
+//   <div class="form-row">
+//     <div class="form-group col-md-6">
+//       <label for="city" class="col-form-label">City</label>
+//       <input type="text" class="form-control" name="city" id="city">
+//     </div>
+//     <div class="form-group col-md-6">
+//       <label for="country" class="col-form-label">Country</label>
+//       <select id="country" name="country" class="form-control">
+//         <option>Choose</option>
+//         <option value="argentina">Argentina</option>
+//         <option value="russia">Russia</option>
+//         <option value="china">China</option>
+//       </select>
+//     </div>
+//   </div>
+//   <div class="form-group">
+//     <div class="form-check">
+//       <label class="form-check-label" for="rules">
+//         <input id="rules" type="checkbox" name="acceptRules" class="form-check-input">
+//         Accept Rules
+//       </label>
+//     </div>
+//   </div>
+//   <button type="submit" class="btn btn-primary">Sign in</button>
+// </form>
+// После отправки формы:
+
+// <div>
+//   <button type="button" class="btn btn-primary">Back</button>
+//   <table class="table">
+//     <tbody>
+//       <tr>
+//         <td>acceptRules</td>
+//         <td>true</td>
+//       </tr>
+//       <tr>
+//         <td>address</td>
+//         <td>lenina street</td>
+//       </tr>
+//       <tr>
+//         <td>city</td>
+//         <td>moscow</td>
+//       </tr>
+//       <tr>
+//         <td>country</td>
+//         <td>russia</td>
+//       </tr>
+//       <tr>
+//         <td>email</td>
+//         <td>my@email.com</td>
+//       </tr>
+//       <tr>
+//         <td>password</td>
+//         <td>qwerty</td>
+//       </tr>
+//     </tbody>
+//   </table>
+// </div>
+// Строки сортируются в алфавитном порядке по именам в первом столбце. В вашем случае результирующая таблица может отличаться, все зависит от того какие данные выбраны.
+
+const MyForm = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    address: '',
+    city: '',
+    country: '',
+    acceptRules: false
+  });
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleInputChange = (e) => {
+    const {name, value, type, checked} = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
+  const handleBack = () => {
+    setIsSubmittedt(false);
+  };
+
+  if (isSubmitted) {
+    const dataEntries = Object.entries(formData);
+    const sortedEntries = dataEntries.sort(([keyA], [keyB]) => 
+      keyA.localeCompare(keyB)
+    );
+    
+    return (
+      <div>
+        <button 
+          type="button" 
+          className="btn btn-primary"
+          onClick={handleBack}
+        >
+          Back
+        </button>
+        <table className="table">
+          <tbody>
+            {sortedEntries.map(([key, value]) => (
+              <tr key={key}>
+                <td>{key}</td>
+                <td>{value.toString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+  
+  // Если форма не отправлена, показываем форму
+  return (
+    <form name="myForm" onSubmit={handleSubmit}>
+      <div className="form-row">
+        <div className="form-group col-md-6">
+          <label htmlFor="email" className="col-form-label">Email</label>
+          <input 
+            type="email" 
+            name="email" 
+            className="form-control" 
+            id="email" 
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+        <div className="form-group col-md-6">
+          <label htmlFor="password" className="col-form-label">Password</label>
+          <input 
+            type="password" 
+            name="password" 
+            className="form-control" 
+            id="password" 
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+      </div>
+      
+      <div className="form-group">
+        <label htmlFor="address" className="col-form-label">Address</label>
+        <textarea 
+          className="form-control" 
+          name="address" 
+          id="address" 
+          placeholder="1234 Main St"
+          value={formData.address}
+          onChange={handleInputChange}
+          required
+        />
+      </div>
+      
+      <div className="form-row">
+        <div className="form-group col-md-6">
+          <label htmlFor="city" className="col-form-label">City</label>
+          <input 
+            type="text" 
+            className="form-control" 
+            name="city" 
+            id="city"
+            value={formData.city}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+        <div className="form-group col-md-6">
+          <label htmlFor="country" className="col-form-label">Country</label>
+          <select 
+            id="country" 
+            name="country" 
+            className="form-control"
+            value={formData.country}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Choose</option>
+            <option value="argentina">Argentina</option>
+            <option value="russia">Russia</option>
+            <option value="china">China</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="form-group">
+        <div className="form-check">
+          <label className="form-check-label" htmlFor="rules">
+            <input 
+              id="rules" 
+              type="checkbox" 
+              name="acceptRules" 
+              className="form-check-input"
+              checked={formData.acceptRules}
+              onChange={handleInputChange}
+              required
+            />
+            Accept Rules
+          </label>
+        </div>
+      </div>
+      
+      <button type="submit" className="btn btn-primary">Sign in</button>
+    </form>
+  );
+};
+
+export default MyForm;
