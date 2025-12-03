@@ -533,3 +533,390 @@ const MyForm = () => {
 };
 
 export default MyForm;
+
+
+
+// Реализуйте компонент, который представляет собой две кнопки и лог событий:
+// Лог — это список значений, каждое из которых получается после нажатия на одну из двух кнопок. Снизу находятся более старые события, сверху новые.
+// Левая кнопка + добавляет в лог строчку с новым значением равным: значение "самой новой существующей записи лога" + 1
+// Правая кнопка - добавляет в лог строчку с новым значением равным: значение "самой новой существующей записи лога" - 1
+// При клике на запись в логе, она удаляется.
+
+// Начальный HTML:
+// <div>
+//   <div class="btn-group" role="group">
+//     <button type="button" class="btn hexlet-inc">+</button>
+//     <button type="button" class="btn hexlet-dec">-</button>
+//   </div>
+// </div>
+// После нажатия последовательности +, +, -, +:
+
+// <div>
+//   <div class="btn-group" role="group">
+//     <button type="button" class="btn hexlet-inc">+</button>
+//     <button type="button" class="btn hexlet-dec">-</button>
+//   </div>
+//   <div class="list-group">
+//     <button type="button" class="list-group-item list-group-item-action">2</button>
+//     <button type="button" class="list-group-item list-group-item-action">1</button>
+//     <button type="button" class="list-group-item list-group-item-action">2</button>
+//     <button type="button" class="list-group-item list-group-item-action">1</button>
+//   </div>
+// </div>
+
+import React, { useState } from 'react';
+
+const CounterLog = () => {
+  // Состояние для хранения лога значений
+  const [log, setLog] = useState([]);
+  
+  // Функция для добавления нового значения в лог
+  const addToLog = (increment) => {
+    // Получаем последнее (самое новое) значение из лога
+    const lastValue = log.length > 0 ? log[0] : 0;
+    
+    // Вычисляем новое значение
+    const newValue = lastValue + increment;
+    
+    // Добавляем новое значение в начало массива (сверху)
+    setLog([newValue, ...log]);
+  };
+  
+  // Функция для удаления элемента из лога
+  const removeFromLog = (index) => {
+    // Создаем новый массив без элемента по указанному индексу
+    const newLog = [...log];
+    newLog.splice(index, 1);
+    setLog(newLog);
+  };
+  
+  // Обработчики кликов по кнопкам
+  const handleIncrement = () => {
+    addToLog(1);
+  };
+  
+  const handleDecrement = () => {
+    addToLog(-1);
+  };
+  
+  return (
+    <div>
+      <div className="btn-group" role="group">
+        <button 
+          type="button" 
+          className="btn hexlet-inc"
+          onClick={handleIncrement}
+        >
+          +
+        </button>
+        <button 
+          type="button" 
+          className="btn hexlet-dec"
+          onClick={handleDecrement}
+        >
+          -
+        </button>
+      </div>
+      
+      {/* Отображаем лог, если есть записи */}
+      {log.length > 0 && (
+        <div className="list-group">
+          {log.map((value, index) => (
+            <button
+              key={index}
+              type="button"
+              className="list-group-item list-group-item-action"
+              onClick={() => removeFromLog(index)}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CounterLog;
+
+
+
+// Реализуйте простой Todo, с возможностью добавлять и удалять заметки.
+// Основной компонент, который выводит форму для добавления новой записи и выводит список заметок на экран.
+// Начальный HTML:
+
+// <div>
+//   <div class="mb-3">
+//     <form class="todo-form form-inline mx-3">
+//       <div class="form-group">
+//         <input type="text" value="" required="" class="form-control mr-3" placeholder="I am going...">
+//       </div>
+//       <button type="submit" class="btn btn-primary">add</button>
+//     </form>
+//   </div>
+// </div>
+// src/Item.jsx
+// Отрисовывает конкретный элемент списка. Принимает на вход свойства:
+
+// task
+// onRemove
+// HTML с добавленными заметками:
+
+// <div>
+//   <div class="mb-3">
+//     <form class="todo-form form-inline mx-3">
+//       <div class="form-group">
+//         <input type="text" value="" required="" class="form-control mr-3" placeholder="I am going...">
+//       </div>
+//       <button type="submit" class="btn btn-primary">add</button>
+//     </form>
+//   </div>
+//   <div>
+//     <div class="row">
+//       <div>
+//         <button type="button" class="btn btn-primary btn-sm">-</button>
+//       </div>
+//       <div class="col-10">second</div>
+//     </div>
+//     <hr>
+//   </div>
+//   <div>
+//     <div class="row">
+//       <div>
+//         <button type="button" class="btn btn-primary btn-sm">-</button>
+//       </div>
+//       <div class="col-10">first</div>
+//     </div>
+//     <hr>
+//   </div>
+// </div>
+// Добавление элементов происходит в обратном порядке. Новые всегда сверху.
+
+import React, { useState } from 'react';
+import { uniqueId } from 'lodash';
+import Item from './Item.jsx';
+
+const ToDoBox = () => {
+  // Состояние для хранения списка задач
+  const [tasks, setTasks] = useState([]);
+
+  // Состояние для значения input
+  const [inputValue, setInputValue] = useState('');
+
+  // Обработчик изменения input
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  // Обработчик отправки формы
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!inputValue.trim()) {
+      return; // Не добавляем пустые задачки
+    }
+
+    // Создаем новую задачу с уникальным id
+    const newTask = {
+      id: uniqueId(),
+      text: inputValue.trim()
+    };
+
+    // Добавляем новую задачу в начало массива
+    setTasks([newTask, ...tasks]);
+
+    // Очищаем input
+    setInputValue('');
+  };
+
+  const handleRemoveTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  return (
+    <div>
+      <div className="mb-3">
+        <form action="" className="todo-form form-inline mx-3" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <input type="text" className="form-control mr-3" value={inputValue} onChange={handleInputChange} required placeholder="I am going..."/>
+          </div>
+          <button className="btn btn-primary" type="submit">add</button>
+        </form>
+      </div>
+      {/* рендер списка задач */}
+      {tasks.map(task => (
+        <Item key={task.id} task={task.text} onRemove={() => handleRemoveTask(task.id)} />
+      ))}
+    </div>
+  );
+};
+
+export default ToDoBox;
+
+
+
+// Реализуйте компонент <Card> так чтобы можно составлять такую структуру:
+// <Card>
+//   <Card.Body>
+//     <Card.Title>Title</Card.Title>
+//     <Card.Text>Text</Card.Text>
+//   </Card.Body>
+// </Card>
+// Получившийся HTML:
+// <div class="card">
+//   <div class="card-body">
+//     <h4 class="card-title">Title</h4>
+//     <p class="card-text">Text</p>
+//   </div>
+// </div>
+
+const Card = ({children}) => {
+  return (
+    <div className="card">{children}</div>
+  );
+}
+
+Card.Body = ({children}) => {
+  return (
+    <div className="card-body">{children}</div>
+  );
+};
+
+Card.Tittle = ({children}) => {
+  return (
+    <h4 className="card-tittle">{children}</h4>
+  );
+};
+
+Card.Text = ({children}) => {
+  return (
+    <p className="card-text">{children}</p>
+  );
+};
+
+export default Card;
+
+
+
+// Реализуйте компонент <Modal> (Модальное окно)
+// Использование:
+// export default class Component extends React.Component {
+//   state = { modal: false };
+//   toggle = (e) => {
+//     e.preventDefault();
+ 
+//     this.setState({
+//       modal: !this.state.modal,
+//     });
+//   }
+//   render() {
+//     return (
+//       <div>
+//         <button type="button" className="modal-open-button btn btn-danger" onClick={this.toggle}>Open</button>
+//         <Modal isOpen={this.state.modal}>
+//           <Modal.Header toggle={this.toggle}>Modal title</Modal.Header>
+//           <Modal.Body>
+//             Lorem ipsum dolor sit amet, consectetur adipisicing elit
+//           </Modal.Body>
+//           <Modal.Footer>
+//             <button type="button" className="modal-close-button btn btn-default" onClick={this.toggle}>Cancel</button>
+//           </Modal.Footer>
+//         </Modal>
+//       </div>
+//     );
+//   }
+// }
+
+// HTML закрытого состояния:
+// <div>
+//   <button type="button" class="modal-open-button btn btn-danger">Open</button>
+//   <div class="modal" style="display: none;" role="dialog">
+//     <div class="modal-dialog">
+//       <div class="modal-content">
+//         <div class="modal-header">
+//           <div class="modal-title">Modal title</div>
+//           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+//             <span aria-hidden="true">×</span>
+//           </button>
+//         </div>
+//         <p class="modal-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+//         <p class="modal-footer">
+//           <button type="button" class="modal-close-button btn btn-default">Cancel</button>
+//         </p>
+//       </div>
+//     </div>
+//   </div>
+// </div>
+// В открытом состоянии строчка: <div class="modal" style="display: none;"> заменяется на <div class="modal fade show" style="display: block;">
+// У открытого модального окна две кнопки закрывающие его: крестик справа вверху и кнопка Cancel справа внизу.
+
+import React, { useEffect } from 'react';
+
+const Modal = ({ isOpen, children }) => {
+  // Блокируем скролл body когда модалка открыта
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    // Очищаем при размонтировании
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
+
+  // Если модалка закрыта - не рендерим или рендерим с display: none
+  if (!isOpen) {
+    return (
+      <div className="modal" style={{ display: 'none' }} role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Если модалка открыта - рендерим с классами show
+  return (
+    <div className="modal fade show" style={{ display: 'block' }} role="dialog">
+      <div className="modal-dialog">
+        <div className="modal-content">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Компонент заголовка модалки
+Modal.Header = ({ toggle, children }) => {
+  return (
+    <div className="modal-header">
+      <div className="modal-title">{children}</div>
+      <button
+        type="button"
+        className="close"
+        onClick={toggle}
+        aria-label="Close"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+  );
+};
+
+// Компонент тела модалки
+Modal.Body = ({ children }) => {
+  return <p className="modal-body">{children}</p>;
+};
+
+// Компонент футера модалки
+Modal.Footer = ({ children }) => {
+  return <p className="modal-footer">{children}</p>;
+};
+
+export default Modal;
